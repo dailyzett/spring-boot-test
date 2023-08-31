@@ -67,4 +67,26 @@ class EmployeeRepositoryTest {
         assertThat(allEmployees).isNotNull();
         assertThat(allEmployees.size()).isEqualTo(3);
     }
+
+    @Test
+    void givenEmployee_whenFindById_thenReturnEmployeeObject() {
+        //given
+        Employee employee3 = Employee.builder()
+                .firstName("Duck")
+                .lastName("Kim")
+                .email("Kim@gmail.com")
+                .build();
+
+        //when
+        employeeRepository.save(employee3);
+
+        //then
+        employeeRepository.findById(employee3.getId())
+                .ifPresentOrElse(employee -> {
+                    assertThat(employee).isNotNull();
+                    assertThat(employee.getId()).isEqualTo(employee3.getId());
+                }, () -> {
+                    throw new RuntimeException("Employee not found");
+                });
+    }
 }
