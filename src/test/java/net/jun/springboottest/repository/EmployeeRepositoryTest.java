@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
@@ -31,5 +33,38 @@ class EmployeeRepositoryTest {
         //then
         assertThat(savedEmployee.getId()).isNotNull();
         assertThat(savedEmployee.getId()).isGreaterThan(0);
+    }
+
+    @Test
+    void givenEmployeeList_whenFindAll_thenEmployeesList() {
+        //given
+        Employee employee = Employee.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .email("John@gmail.com")
+                .build();
+
+        Employee employee1 = Employee.builder()
+                .firstName("Ramesh")
+                .lastName("Ramesh")
+                .email("Ramesh@gmail.com")
+                .build();
+
+        Employee employee3 = Employee.builder()
+                .firstName("Duck")
+                .lastName("Kim")
+                .email("Kim@gmail.com")
+                .build();
+
+        employeeRepository.save(employee);
+        employeeRepository.save(employee1);
+        employeeRepository.save(employee3);
+
+        //when
+        List<Employee> allEmployees = employeeRepository.findAll();
+
+        //then
+        assertThat(allEmployees).isNotNull();
+        assertThat(allEmployees.size()).isEqualTo(3);
     }
 }
