@@ -89,4 +89,95 @@ class EmployeeRepositoryTest {
                     throw new RuntimeException("Employee not found");
                 });
     }
+
+    @Test
+    void givenEmail_whenFindByEmail_thenReturnEmployeeObject() {
+        //given
+        Employee employee3 = Employee.builder()
+                .firstName("Duck")
+                .lastName("Kim")
+                .email("Kim@gmail.com")
+                .build();
+        employee3 = employeeRepository.save(employee3);
+
+        //when
+        Employee finalEmployee = employee3;
+        employeeRepository.findByEmail(employee3.getEmail()).ifPresentOrElse(employee -> {
+            //then
+            assertThat(employee).isNotNull();
+            assertThat(employee.getEmail()).isEqualTo(finalEmployee.getEmail());
+        }, () -> {
+            throw new RuntimeException("Employee not found");
+        });
+    }
+
+    @Test
+    void givenEmployeeObject_whenUpdate_thenSuccessUpdateForObject() {
+        //given
+        Employee employee = Employee.builder()
+                .firstName("Duck")
+                .lastName("Kim")
+                .email("Kim@gmail.com")
+                .build();
+        employeeRepository.save(employee);
+
+        //when
+        employeeRepository.findById(employee.getId()).ifPresentOrElse(employee1 -> {
+            employee1.setFirstName("Change");
+            employee1.setLastName("Test");
+            employee1.setEmail("Change@gmail.com");
+        }, () -> {
+            throw new RuntimeException("Employee not found");
+        });
+        //then
+        employeeRepository.findById(employee.getId()).ifPresentOrElse(employee1 -> {
+            assertThat(employee1).isNotNull();
+            assertThat(employee1.getFirstName()).isEqualTo("Change");
+            assertThat(employee1.getLastName()).isEqualTo("Test");
+            assertThat(employee1.getEmail()).isEqualTo("Change@gmail.com");
+        }, () -> {
+            throw new RuntimeException("Employee not found");
+        });
+    }
+
+    @Test
+    void givenEmployeeObject_whenDelete_thenSuccessDeleteForObject() {
+        //given
+        Employee employee = Employee.builder()
+                .firstName("Duck")
+                .lastName("Kim")
+                .email("Kim@gmail.com")
+                .build();
+        employeeRepository.save(employee);
+
+        //when
+        employeeRepository.delete(employee);
+
+        //then
+        employeeRepository.findById(employee.getId()).ifPresentOrElse(employee1 -> {
+            throw new RuntimeException("Employee not found");
+        }, () -> {
+            assertThat(true).isTrue();
+        });
+    }
+
+    @Test
+    void givenFirstNameAndLastName_whenFindByJPQL_thenReturnEmployeeObject() {
+        //given
+        Employee employee = Employee.builder()
+                .firstName("Duck")
+                .lastName("Kim")
+                .email("Kim@gmail.com")
+                .build();
+        employeeRepository.save(employee);
+
+        //when
+        Employee byJPQL = employeeRepository.findByJPQL(employee.getFirstName(), employee.getLastName());
+
+        //then
+        assertThat(byJPQL).isNotNull();
+        assertThat(byJPQL.getFirstName()).isEqualTo(employee.getFirstName());
+        assertThat(byJPQL.getLastName()).isEqualTo(employee.getLastName());
+        assertThat(byJPQL.getEmail()).isEqualTo(employee.getEmail());
+    }
 }
